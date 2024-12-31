@@ -5,11 +5,15 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { House } from "lucide-react";
 import RSVPTable from "@/app/_components/RSVPTable";
+import { signOut } from "@/app/actions/auth";
 
 export default async function RSVPsPage() {
   const { success, data, message } = await getRSVPs();
 
   // TODO: redirect to login if not authenticated
+  if (!success) {
+    return <div className="container mx-auto mt-8 p-4">Error: {message}</div>;
+  }
 
   return (
     <div className="container mx-auto mt-8 p-4">
@@ -23,7 +27,9 @@ export default async function RSVPsPage() {
           </Link>
 
           {/* Logout */}
-          <Button variant={"outline"}>Sign Out</Button>
+          <form action={signOut}>
+            <Button variant={"outline"}>Sign Out</Button>
+          </form>
         </div>
       </div>
 
