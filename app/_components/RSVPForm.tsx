@@ -39,7 +39,7 @@ export default function RSVPForm() {
     formData.append("accompany", accompany || "0");
     formData.append("attendance", attendance);
 
-    console.log("formData", formData);
+    // console.log("formData", formData);
 
     setIsLoading(true);
     const response = await submitRSVP(formData);
@@ -48,6 +48,7 @@ export default function RSVPForm() {
       toast({
         title: "Success!",
         description: strings.thankYouMessage,
+        variant: "success",
       });
       // Reset Form
       setName("");
@@ -63,6 +64,16 @@ export default function RSVPForm() {
       });
 
       // TODO: Check if email is already submitted
+      if (response.error && (response.error as { code?: string }).code) {
+        if ((response.error as { code: string }).code === "23505") {
+          setErrors({ email: "Email is already submitted." });
+          toast({
+            title: "Error!",
+            description: "Email is already submitted.",
+            variant: "destructive",
+          });
+        }
+      }
     }
 
     setIsLoading(false);
