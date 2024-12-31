@@ -8,6 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { strings } from "../utils/strings";
+import { submitRSVP } from "../actions/submitRSVP";
 
 export default function RSVPForm() {
   const [name, setName] = useState("");
@@ -18,8 +19,53 @@ export default function RSVPForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = () => {
-    console.log("submit");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!name) {
+      setErrors({ name: "Name is required" });
+      return;
+    }
+
+    if (!email) {
+      setErrors({ email: "Email is required" });
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("accompany", accompany || "0");
+    formData.append("attendance", attendance);
+
+    console.log("formData", formData);
+
+    setIsLoading(true);
+    const response = await submitRSVP(formData);
+
+    if (response.success) {
+      toast({
+        title: "Success!",
+        description: strings.thankYouMessage,
+      });
+      // Reset Form
+      setName("");
+      setEmail("");
+      setAccompany(null);
+      setAttendance("yes");
+      setErrors({});
+    } else {
+      toast({
+        title: "Error!",
+        description: response.message,
+        variant: "destructive",
+      });
+
+      // TODO: Check if email is already submitted
+    }
+
+    setIsLoading(false);
   };
 
   const openGoogleMaps = () => {
